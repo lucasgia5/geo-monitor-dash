@@ -7,23 +7,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Building2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
-const Login = () => {
+const Register = () => {
   const navigate = useNavigate();
-  const { login, isLoading } = useAuth();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const { register, isLoading } = useAuth();
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!username || !password) {
+    if (!formData.username || !formData.email || !formData.password) {
       return;
     }
 
-    const success = await login(username, password);
+    if (formData.password !== formData.confirmPassword) {
+      return;
+    }
+
+    const success = await register(formData.username, formData.email, formData.password);
     if (success) {
       navigate("/");
     }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
 
   return (
@@ -45,26 +60,34 @@ const Login = () => {
 
         <Card className="shadow-elevated">
           <CardHeader>
-            <CardTitle>Entrar na plataforma</CardTitle>
+            <CardTitle>Criar conta</CardTitle>
             <CardDescription>
-              Insira suas credenciais para acessar o sistema
+              Preencha os dados para criar sua conta no sistema
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>Para testar:</strong> Usuário: <code>demo</code> | Senha: <code>demo123</code>
-              </p>
-            </div>
-            <form onSubmit={handleLogin} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="username">Nome de usuário</Label>
                 <Input
                   id="username"
+                  name="username"
                   type="text"
                   placeholder="Seu nome de usuário"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                  value={formData.username}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">E-mail</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="seu@email.com"
+                  value={formData.email}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -72,10 +95,23 @@ const Login = () => {
                 <Label htmlFor="password">Senha</Label>
                 <Input
                   id="password"
+                  name="password"
                   type="password"
                   placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirmar senha</Label>
+                <Input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
                   required
                 />
               </div>
@@ -83,17 +119,17 @@ const Login = () => {
                 type="submit"
                 className="w-full"
                 size="lg"
-                disabled={isLoading}
+                disabled={isLoading || formData.password !== formData.confirmPassword}
               >
-                {isLoading ? "Entrando..." : "Entrar"}
+                {isLoading ? "Criando conta..." : "Criar conta"}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Não tem uma conta?{" "}
-                <Link to="/register" className="text-primary hover:underline">
-                  Criar conta
+                Já tem uma conta?{" "}
+                <Link to="/login" className="text-primary hover:underline">
+                  Fazer login
                 </Link>
               </p>
             </div>
@@ -108,4 +144,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

@@ -1,35 +1,19 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Building2, Upload, Camera, History, ArrowLeft } from "lucide-react";
-import { toast } from "sonner";
+import { Building2, Plus, History, ArrowLeft, FileText } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 const Project = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const [projectName, setProjectName] = useState("");
-  const [createdAt, setCreatedAt] = useState("");
+  const { isAuthenticated, isLoading } = useAuth();
 
-  useEffect(() => {
-    // Verificar autenticação
-    const isAuthenticated = localStorage.getItem("isAuthenticated");
-    if (!isAuthenticated) {
-      navigate("/login");
-      return;
-    }
+  // Componente já está protegido pelo ProtectedRoute
 
-    // Carregar dados do projeto
-    setProjectName(`Projeto ${id}`);
-    setCreatedAt(new Date().toLocaleDateString("pt-BR"));
-  }, [navigate, id]);
-
-  const handleUpload3D = () => {
-    toast.info("Funcionalidade de upload de modelo 3D em desenvolvimento");
-  };
-
-  const handleUploadImage = () => {
-    toast.info("Funcionalidade de upload de imagem em desenvolvimento");
+  const handleNewAnalysis = () => {
+    navigate("/analysis");
   };
 
   const handleViewReports = () => {
@@ -54,8 +38,8 @@ const Project = () => {
                 <Building2 className="w-6 h-6 text-primary-foreground" />
               </div>
               <div>
-                <h1 className="text-xl font-bold">{projectName}</h1>
-                <p className="text-xs text-muted-foreground">Criado em {createdAt}</p>
+                <h1 className="text-xl font-bold">Projeto {id}</h1>
+                <p className="text-xs text-muted-foreground">Sistema de Monitoramento - Metro SP</p>
               </div>
             </div>
           </div>
@@ -71,45 +55,24 @@ const Project = () => {
           </p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {/* Upload 3D Template Card */}
-          <Card className="hover:shadow-elevated transition-all group cursor-pointer" onClick={handleUpload3D}>
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* New Analysis Card */}
+          <Card className="hover:shadow-elevated transition-all group cursor-pointer" onClick={handleNewAnalysis}>
             <CardHeader>
               <div className="w-14 h-14 rounded-lg bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center mb-3 transition-colors">
-                <Upload className="w-7 h-7 text-primary" />
+                <Plus className="w-7 h-7 text-primary" />
               </div>
               <CardTitle className="group-hover:text-primary transition-colors">
-                Template 3D da Obra
+                Nova Análise de Progresso
               </CardTitle>
               <CardDescription>
-                Faça upload do modelo 3D completo da construção finalizada
+                Faça upload das imagens da obra para análise automática de progresso
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="outline" className="w-full">
-                <Upload className="mr-2" />
-                Fazer Upload
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Upload Image Card */}
-          <Card className="hover:shadow-elevated transition-all group cursor-pointer" onClick={handleUploadImage}>
-            <CardHeader>
-              <div className="w-14 h-14 rounded-lg bg-accent/10 group-hover:bg-accent/20 flex items-center justify-center mb-3 transition-colors">
-                <Camera className="w-7 h-7 text-accent" />
-              </div>
-              <CardTitle className="group-hover:text-accent transition-colors">
-                Imagem da Câmera
-              </CardTitle>
-              <CardDescription>
-                Adicione fotos atuais da obra para análise de progresso
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button variant="accent" className="w-full">
-                <Camera className="mr-2" />
-                Adicionar Imagem
+              <Button className="w-full">
+                <Plus className="mr-2 h-4 w-4" />
+                Iniciar Análise
               </Button>
             </CardContent>
           </Card>
@@ -118,18 +81,18 @@ const Project = () => {
           <Card className="hover:shadow-elevated transition-all group cursor-pointer" onClick={handleViewReports}>
             <CardHeader>
               <div className="w-14 h-14 rounded-lg bg-success/10 group-hover:bg-success/20 flex items-center justify-center mb-3 transition-colors">
-                <History className="w-7 h-7 text-success" />
+                <FileText className="w-7 h-7 text-success" />
               </div>
               <CardTitle className="group-hover:text-success transition-colors">
                 Histórico de Relatórios
               </CardTitle>
               <CardDescription>
-                Visualize todos os relatórios de progresso gerados
+                Visualize todos os relatórios de progresso gerados para este projeto
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button variant="success" className="w-full">
-                <History className="mr-2" />
+              <Button variant="outline" className="w-full">
+                <History className="mr-2 h-4 w-4" />
                 Ver Histórico
               </Button>
             </CardContent>
@@ -148,7 +111,7 @@ const Project = () => {
                   1
                 </div>
                 <p>
-                  <strong className="text-foreground">Upload do Template 3D:</strong> Carregue o modelo 3D da obra finalizada para servir como referência
+                  <strong className="text-foreground">Imagem Modelo:</strong> Faça upload de uma imagem da obra finalizada como referência
                 </p>
               </div>
               <div className="flex items-start gap-3">
@@ -156,7 +119,7 @@ const Project = () => {
                   2
                 </div>
                 <p>
-                  <strong className="text-foreground">Captura de Imagens:</strong> Adicione fotos atuais da construção para análise automática
+                  <strong className="text-foreground">Imagens Atuais:</strong> Adicione fotos do estado atual da obra para comparação
                 </p>
               </div>
               <div className="flex items-start gap-3">
@@ -164,7 +127,7 @@ const Project = () => {
                   3
                 </div>
                 <p>
-                  <strong className="text-foreground">Relatórios Automáticos:</strong> O sistema gera relatórios de progresso comparando as imagens com o modelo 3D
+                  <strong className="text-foreground">Análise Inteligente:</strong> IA compara as imagens e gera relatório automático de progresso
                 </p>
               </div>
             </CardContent>
